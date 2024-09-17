@@ -1,7 +1,7 @@
 services:
   mikhmon:
-    image: ethergig/mikhmon:latest
-    container_name: mikhmon
+    image: ethergig/mikhmonv3:v3.20-patched-ros7.10
+    container_name: mikhmonv3-patched-ros7.10
     restart: unless-stopped
     volumes:
       - data:/var/www/html
