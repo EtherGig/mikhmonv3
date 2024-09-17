@@ -1,4 +1,5 @@
 ### MIKHMON V3
+#### Patched to work with new date format on RouterOS 7.10+
 
 #### Download update.zip
 [update.zip](https://raw.githubusercontent.com/laksa19/laksa19.github.io/master/download/update.zip){:target="_blank"}
