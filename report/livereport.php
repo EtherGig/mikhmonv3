@@ -50,7 +50,7 @@ include('../lang/'.$langid.'.php');
     $lreport = "style='display:block;'";
 // get selling report
     $thisD = date("d");
-    $thisM = strtolower(date("M"));
+    $thisM = date("m");
     $thisY = date("Y");
 
     if (strlen($thisD) == 1) {
@@ -59,7 +59,7 @@ include('../lang/'.$langid.'.php');
       $thisD = $thisD;
     }
 
-    $idhr = $thisM . "/" . $thisD . "/" . $thisY;
+    $idhr = $thisY . "-" . $thisM . "-" . $thisD;
     $idbl = $thisM . $thisY;
 
     $_SESSION[$session.'idhr'] = $idhr;

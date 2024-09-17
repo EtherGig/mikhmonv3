@@ -30,10 +30,11 @@ $session = $_GET['session'];
   include('../include/readcfg.php');
 
 $idbl = $_GET['idbl'];
-$thisM = substr($idbl,0,3);
+// new Date($idb1);
+$thisM = substr($idbl,0,2);
 $thisY = substr($idbl,-4);
 
-$ms = array(1 => "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec");
+$ms = array(1 => "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12");
 $mn = array_search($thisM, $ms);
 
 // https://secure.php.net/manual/en/function.cal-days-in-month.php#38666
@@ -50,13 +51,15 @@ if ($mn == date("n")){
   $totD = (days_in_month($mn, $thisY)+ 1);
 }
 
+// var_dump($_SESSION['dataresume']);
+
 function resume_per_day($date){
 $evalue =  explode($date,$_SESSION['dataresume']);
 $x = count($evalue);
 			for ($i = 0; $i < $x; $i++) {
 				$result += (int) $evalue[$i];
 			}
-			return ($x-1).'/'.$result;
+			return ($x-1).'-'.$result;
 }
 
 $totalvrc =  explode("/",$_SESSION['totalresume'])[0];
@@ -64,12 +67,31 @@ $totalincome = explode("/",$_SESSION['totalresume'])[1];
 
 
 if ($currency == in_array($currency, $cekindo['indo'])) {
-  $totalreport = "Total " . $totalvrc . "vcr : " . $currency . " " . number_format((float)$totalincome, 0, ",", ".");
+  $totalreport = "Total " . $totalvrc . " voucher : " . $currency . " " . number_format((float)$totalincome, 0, ",", ".");
 
 } else {
-  $totalreport = "Total " . $totalvrc . "vcr : " . $currency . " " . number_format((float)$totalincome, 2);
+  $totalreport = "Total " . $totalvrc . " voucher : " . $currency . " " . number_format((float)$totalincome, 2);
 }
 
+$date_values = [];
+$data = $_SESSION['dataresume'];
+// Modify the regular expression to capture variable-length digits after the date
+preg_match_all('/(\d{4}-\d{2}-\d{2})(\d+)(?=(\d{4}-\d{2}-\d{2})|$)/', $data, $matches, PREG_SET_ORDER);
+
+foreach ($matches as $match) {
+    $date = $match[1];  // The date in YYYY-MM-DD format
+    $value = (int)$match[2];  // The corresponding numeric value (now variable in length)
+
+    // If the date already exists, sum the values and increment the vcr count
+    if (isset($date_values[$date])) {
+        $date_values[$date] += $value;
+        $date_values[$date.'_vcr'] = isset($date_values[$date.'_vcr']) ? $date_values[$date.'_vcr'] + 1 : 1;
+    } else {
+        // Initialize the date value and set the vcr count to 1
+        $date_values[$date] = $value;
+        $date_values[$date.'_vcr'] = 1;
+    }
+}
 
 }
 ?>
@@ -131,16 +153,18 @@ Highcharts.chart('container', {
         data: [
 <?php
 
-for ($i = 1; $i < $totD; $i++) {
-        if (strlen($i) == "1") {
-          $thisD = "0" . $i;
-        } else {
-          $thisD = $i;
-        }
-        $idhr = strtolower($thisM . '/' . $thisD . '/' . $thisY);
-        if(explode("/",resume_per_day($idhr))[1] == ""){$r = 0;}else{$r = explode("/",resume_per_day($idhr))[1];}
-        echo "['<b>".$thisD." " .ucfirst($thisM)." ".explode("/",resume_per_day($idhr))[0]."vcr</b>',".$r."],";
+for ($i = 1; $i <= $totD-1; $i++) {
+  if (strlen($i) == 1) {
+      $thisD = "0" . $i;
+  } else {
+      $thisD = $i;
+  }
+
+  $dateIndex = $thisY . '-' . $thisM . '-' . $thisD;
+
+  echo "['<b>" . $thisD . " " . ucfirst($thisM) . " " . ($date_values[$dateIndex.'_vcr'] ?? 0) . " voucher</b>'," . ($date_values[$dateIndex] ?? 0) . "],";
 }
+
 
 ?>
 
