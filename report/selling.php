@@ -24,7 +24,7 @@ if (!isset($_SESSION["mikhmon"])) {
 
 	$idhr = $_GET['idhr'];
 	$idbl = $_GET['idbl'];
-	$idbl2 = explode("/",$idhr)[0].explode("/",$idhr)[2];
+	$idbl2 = explode("-",$idhr)[1].explode("-",$idhr)[0];
 	if ($idhr != ""){
 		$_SESSION['report'] = "&idhr=".$idhr;
 	} elseif ($idbl != ""){
@@ -225,7 +225,7 @@ $(document).ready(function(){
 <div class="col-12">
 <div class="card">
 <div class="card-header">
-	<h3><i class=" fa fa-money"></i> <?= $_selling_report ?> <?= ucfirst($idhr) . ucfirst(substr($idbl,0,3).' '.substr($idbl,3,5));	if ($prefix != "") {echo " prefix [" . $prefix . "]";} ?> <small id="loader" style="display: none;" ><i><i class='fa fa-circle-o-notch fa-spin'></i> <?= $_processing ?> </i></small></h3>
+	<h3><i class=" fa fa-money"></i> <?= $_selling_report ?> <?= ucfirst($idhr) . ucfirst(substr($idbl,0,2).' '.substr($idbl,2,4));	if ($prefix != "") {echo " prefix [" . $prefix . "]";} ?> <small id="loader" style="display: none;" ><i><i class='fa fa-circle-o-notch fa-spin'></i> <?= $_processing ?> </i></small></h3>
 </div>
 <div class="card-body">
 <div class="row">
@@ -237,7 +237,7 @@ $(document).ready(function(){
 		  <button class="btn bg-primary" onclick="exportTableToCSV('report-mikhmon-<?= $filedownload . $fprefix; ?>.csv')" title="Download selling report"><i class="fa fa-download"></i> CSV</button>
 			<button class="btn bg-primary" onclick="location.href='./?report=selling&session=<?= $session; ?>';" title="Reload all data"><i class="fa fa-search"></i> <?= $_all ?></button>
 			<?php if(!empty($idbl)){echo '<button name="resume" id="openResume" class="btn bg-primary"title="Resume Report"><i class="fa fa-area-chart"></i> '.$_resume.'</button>';}else{
-				echo '<a class="btn bg-primary" href="./?report=selling&idbl='.$idbl2.'&session='.$session.'" title="Show '.ucfirst(substr($idbl2,0,3).' '.substr($idbl2,3,5)).'"><i class="fa fa-search"></i> '.ucfirst(substr($idbl2,0,3).' '.substr($idbl2,3,5)).'</a>';}?>
+				echo '<a class="btn bg-primary" href="./?report=selling&idbl='.$idbl2.'&session='.$session.'" title="Show '.ucfirst(substr($idbl2,0,2 ).' '.substr($idbl2,2,4)).'"><i class="fa fa-search"></i> '.ucfirst(substr($idbl2,0,2).' '.substr($idbl2,2,4)).'</a>';}?>
 		  <button name="print" class="btn bg-primary" onclick="window.open('./report/print.php?<?= explode("?report=selling&",$url)[1] ?>','_blank');" title="Print"><i class="fa fa-print"></i> <?= $_print ?></button>
 		  <button style="display: <?= $shd; ?>;" name="remdata" class="btn bg-danger" onclick="location.href='#remdata';" title="Delete Data <?= $filedownload; ?>"><i class="fa fa-trash"></i> <?= $_delete_data.' '. $filedownload; ?></button>
 		  <button  id="remSelected" style="display: none;" class="btn bg-red" onclick="MikhmonRemoveReportSelected()"><i class="fa fa-trash"></i> <span id="selected"></span> <?= $_selected ?></button>
@@ -248,7 +248,7 @@ $(document).ready(function(){
 			<div class="input-group-1 col-box-2">
 			<select style="padding:5px;" class="group-item group-item-l" title="<?= $_days ?>" id="D">
         			<?php
-										$day = explode("/", $idhr)[1];
+										$day = explode("-", $idhr)[2];
 										if ($day != "") {
 											echo "<option value='" . $day . "'>" . $day . "</option>";
 										}
@@ -268,10 +268,10 @@ $(document).ready(function(){
 			<div class="input-group-2 col-box-4">
 			<select style="padding:5px;" class="group-item group-item-md" title="Month" id="M">
         			<?php
-										$idbls = array(1 => "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec");
+										$idbls = array(1 => "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12");
 										$idblf = array(1 => "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
-										$month = explode("/", $idhr)[0];
-										$month1 = substr($idbl, 0, 3);
+										$month = explode("-", $idhr)[1];
+										$month1 = substr($idbl, 0, 2);
 
 										if ($month != "") {
 											$fm = array_search($month, $idbls);
@@ -291,8 +291,8 @@ $(document).ready(function(){
 			<div class="input-group-2 col-box-3">
 			<select style="padding:5px;" class="group-item group-item-md" title="Year" id="Y">
         			<?php
-										$year = explode("/", $idhr)[2];
-										$year1 = substr($idbl, 3, 4);
+										$year = explode("-", $idhr)[0];
+										$year1 = substr($idbl, 2 , 6);
 
 										if ($year != "") {
 											echo "<option>" . $year . "</option>";
@@ -322,7 +322,7 @@ $(document).ready(function(){
 					var X = document.getElementById('filterTable').value;
 
 					if(D !== ""){
-						window.location='./?report=selling&idhr='+M+'/'+D+'/'+Y+'&prefix='+X+'&session=<?= $session; ?>';
+						window.location='./?report=selling&idhr='+Y+'-'+M+'-'+D+'&prefix='+X+'&session=<?= $session; ?>';
 					}else if(D === ""){
 						window.location='./?report=selling&idbl='+M+Y+'&prefix='+X+'&session=<?= $session; ?>';
 					}
@@ -417,7 +417,7 @@ $(document).ready(function(){
 				$_SESSION['dataresume'] = $dataresume;
 				$_SESSION['totalresume'] = $TotalReg.'/'.$totalresume;
 				}
-					
+				
 			}
 
 			?>
